@@ -1,0 +1,19 @@
+{
+  // Trigger ESLint auto-fixes (including Tailwind sorting/rules) on every file save
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+
+  // Ensure Tailwind IntelliSense triggers inside custom classes, strings, and components
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "html",
+    "javascript": "javascript",
+    "javascriptreact": "javascriptreact",
+    "typescript": "typescript",
+    "typescriptreact": "typescriptreact"
+  },
+
+  // Optional: If you use Prettier alongside ESLint, set it as the default formatter
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
+}
