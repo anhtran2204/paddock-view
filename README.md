@@ -1,6 +1,6 @@
 # PaddockView
 
-A personal motorsport dashboard, starting with Formula 1, that brings live race data, results, standings, schedules, news, highlights, and telemetry analysis into one place.
+A public motorsport dashboard, starting with Formula 1, that brings live race data, results, standings, schedules, news, highlights, and telemetry analysis into one place, with personalized and premium tools planned for later releases.
 
 > 🚧 **Status: early development.** The project is still in planning. Features, architecture, and tech choices are all subject to change.
 
@@ -40,7 +40,14 @@ A personal motorsport dashboard, starting with Formula 1, that brings live race 
 
 ## Getting started
 
-Setup instructions will be added once development begins.
+Start with the [documentation hub](docs/README.md) for the current implementation,
+proposed requirements, user flows, architecture, data contracts, and roadmap.
+The initial direction is a public Next.js application on Vercel, with search-friendly
+content and future authenticated or premium tools. Supabase is the preferred backend
+candidate; its first-release responsibilities remain under design.
+
+See the [developer guide](docs/development.md) for local setup and the workflow
+for keeping documentation and the Graphify index aligned with implementation.
 
 ## Disclaimer
 
