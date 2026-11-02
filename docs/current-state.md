@@ -1,7 +1,9 @@
 # Current implementation
 
-**Observed 2026-10-18.** Source is the local working tree at base commit `a0e7f52`.
-Existing uncommitted changes to `AGENTS.md` and `src/app/page.tsx` preceded the docs.
+**App-shell observation: 2026-10-18; planning update: 2026-10-19.** Documentation
+and Graphify instructions were committed in `71163e7`. The existing uncommitted
+`src/app/page.tsx` placeholder edit preceded this documentation work. Approved
+Supabase, testing, and CI/CD choices are planned dependencies, not installed features.
 The working tree takes precedence over the older indexed snapshot.
 
 ## Stack and entry points

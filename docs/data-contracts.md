@@ -1,6 +1,6 @@
 # Data sources and contracts
 
-**Status: proposed.** None of these integrations or services exists yet. External
+**Status: approved direction, updated 2026-10-19; not implemented.** External
 documentation was checked on **2026-10-18**; access rules and coverage can change.
 
 ## Provider allocation
@@ -24,7 +24,7 @@ underlying data or media use. This planning pass has not completed that review.
 
 ## Domain concepts
 
-These are application contracts, not a proposed database schema. Keep only fields
+These are application contracts that guide the later Supabase schema. Keep only fields
 required by a surface; add fields when a feature consumes them.
 
 | Concept              | Identity and essential meaning                                                                         |
@@ -67,10 +67,11 @@ Use discriminated outcomes: `available` (data and fresh/stale/partial metadata),
 always distinguish unsupported from not-published; preserve `unknown` when evidence
 is insufficient. Malformed local input is rejected before transport.
 
-The adapter owns transport, bounded pagination, parsing, and normalization; query
-functions own resource selection and domain outcomes. Start with direct functions
-and narrow parsers. Consider a schema-validation library only when the real payload
-contracts make handwritten validation harder to maintain.
+The Supabase ingestion adapter owns transport, bounded pagination, Zod validation,
+and normalization. Next.js query functions read persisted snapshots and expose the
+contracts above. Generated database types describe storage; view contracts describe
+what the UI needs. Frontend fixtures use those same view contracts before the
+backend exists. Do not let a cache miss switch a public query to the provider.
 
 ### Upstream mapping
 
@@ -83,34 +84,56 @@ references during the first adapter slice. Handle `limit`, `offset`, and total
 counts instead of assuming a single response is complete. Include a versioned
 PaddockView User-Agent as required by the provider.
 
+## Ingestion and persistence contract
+
+Supabase Cron triggers the authenticated ingestion function. Use stable provider
+IDs and idempotent writes; serialize/lease work for the same resource so overlapping
+runs cannot publish older data over newer snapshots. Keep complete result and
+standings snapshots atomic: partial pagination or malformed data must not replace
+the last good publication. Preserve source IDs, retrieval time, optional source
+update time, import version, and coverage metadata. Raw captures are private, bounded
+in size and retention; define capture failures and orphan cleanup in the backend plan.
+
+Record completion, last successful publication, and sanitized failure reason in
+ingestion status. Cron dispatch success is not import success. A valid empty result
+can indicate not-yet-published; a provider error cannot be converted to an empty
+championship. Stored data has a durability/backup requirement independent of caching.
+
 ## Freshness and failure policy
 
-These are proposed cache ages to validate, not provider publication guarantees or
-background polling schedules. Expiry makes data eligible for revalidation on use.
+The following are provisional refresh targets and display limits to verify during
+backend integration. Ingestion scheduling and Next.js cache lifetimes are different
+controls: account for both when checking end-to-end freshness. No provider publication
+time guarantee is implied. Pages do not start upstream refreshes.
 
-| Resource                           | Proposed revalidation age | Maximum stale age for fallback display            |
-| ---------------------------------- | ------------------------- | ------------------------------------------------- |
-| Current-year schedule              | 1 hour                    | 24 hours with warning                             |
-| Current-year results and standings | 15 minutes                | 24 hours with warning                             |
-| Previous-year data                 | 24 hours                  | 7 days with warning                               |
-| Empty/not-published result         | 5 minutes                 | Do not keep serving an old empty state as current |
+| Resource                           | Ingestion refresh target                                       | Maximum stale age for fallback display     |
+| ---------------------------------- | -------------------------------------------------------------- | ------------------------------------------ |
+| Current-year schedule              | Hourly when updates are expected                               | 24 hours with warning                      |
+| Current-year results and standings | Every 15 minutes in relevant publication windows               | 24 hours with warning                      |
+| Previous-year data                 | Import, then daily checks if needed for corrections            | 7 days with warning                        |
+| Empty/not-published result         | Check every 5 minutes in a bounded expected publication window | Do not treat an old empty state as current |
 
-Keep validation failures out of successful domain results. Verify whether cached
-transport data can still fail parsing and prevent it from being labelled usable.
-When revalidation fails, show a previously validated response only if it exists and
-is within the permitted stale age. If the selected cache implementation cannot
-expose the needed timestamp/last-good behavior, use an explicit unavailable state
-and resolve the cache mechanism in the first slice; do not claim resilience the
-framework has not demonstrated. Cache loss has no durability guarantee.
+Reduce unnecessary work outside race/publication windows and share the provider
+request budget across all jobs. Choose and verify explicit page/read cache lifetimes
+within the accepted freshness budget; they must not add an unnoticed full refresh
+interval. Keep the current Next.js cache model; exact Supabase-read cache wrapping
+is implementation work, not an assumption that client queries are cached.
 
-Initial reads have a five-second timeout and no automatic retry. User-triggered
-retry remains subject to cache and provider backoff. Never loop on 429; use any
-provider retry guidance. Do not automatically fall back to a different provider
-with different semantics. Expose stale or unavailable data clearly instead.
+A failed ingestion preserves stored validated data. Display it as stale only within
+the accepted age, otherwise show an explicit unavailable state. Data beyond the
+display age is retained for recovery/history rather than deleted. A database outage
+may still prevent reads; any render-cache fallback must be verified in Vercel.
+Distinguish record retrieval, upstream retrieval, and UI rendering timestamps.
+
+Proposed provider request timeout: five seconds. Start with bounded attempts and
+backoff in ingestion; honor 429 retry guidance and never retry in an unbounded loop.
+Frontend retry repeats a stored-data read and cannot bypass source limits. Do not
+automatically change providers with incompatible semantics.
 
 ## HTTP API boundary
 
-**Current API routes: none. Proposed mandatory first-release API routes: none.**
+**Current API routes: none. Mandatory public first-release read API routes: none.**
+The planned ingestion Edge Function is a separate authenticated backend endpoint.
 Server-rendered pages use the internal contracts above. When polling or another
 client requires HTTP, add a Route Handler under `src/app/api/` over the same reads,
 and document its method, path, validation, example response, freshness metadata,

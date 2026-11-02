@@ -1,6 +1,6 @@
 # Product requirements
 
-**Status: proposed**, except the confirmed public-facing audience and Vercel hosting direction. Scope derives
+**Status: approved planning direction, updated 2026-10-19; not implemented.** Scope derives
 from the [README vision](../README.md). The first release should answer three
 questions reliably: **when is the next session, what happened, and where does the
 championship stand?**
@@ -47,11 +47,15 @@ useful race information. Its content hierarchy and future premium routes are in
 | ID   | Requirement                                                                      | Verification                                                                                                                                                                              |
 | ---- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Q-01 | Provider access stays on the server, with bounded inputs and response validation | Malformed season/round/session inputs do not trigger arbitrary upstream requests; provider secrets and raw errors do not reach browser bundles                                            |
-| Q-02 | Useful failures and bounded waiting                                              | A provider call has a proposed five-second timeout; initial reads make no automatic retry; a failed section offers a safe retry and leaves unrelated sections usable                      |
-| Q-03 | Requests respect provider capacity                                               | Repeated reads reuse the configured cache; pagination is bounded; a 429 stops retries and respects provider retry guidance                                                                |
+| Q-02 | Useful failures and bounded waiting                                              | Provider ingestion has a proposed five-second request timeout and bounded retries; page reads use stored data; failed sections leave unrelated sections usable                            |
+| Q-03 | Requests respect provider capacity                                               | Page reads reuse stored data and configured caches; only ingestion calls providers; pagination is bounded and 429 respects backoff                                                        |
 | Q-04 | Measure performance before adding infrastructure                                 | Record cold and warm page latency, upstream calls per page, and transferred bytes for the first slice; provisional goal: warm page usable within two seconds on the documented test setup |
 | Q-05 | Reproducible, small delivery increments                                          | Each slice passes non-mutating lint, types/build, relevant fixture tests, and its browser journey; CI does not depend on live provider availability                                       |
 | Q-06 | Operational visibility without a platform project                                | Log request duration, provider outcome, cache behavior where observable, and a correlation ID; redact credentials and avoid raw payload dumps                                             |
+
+Testing tools, monitoring ownership, and rollout timing are defined in
+[operations and testing](operations.md). Frontend fixtures validate contracts before
+backend implementation; public-release evidence must also exercise real ingestion.
 
 The performance goal is a planning target, not a measured service-level promise.
 Provider publication latency and access restrictions are outside the app's control.
@@ -63,8 +67,8 @@ other series remain in the vision. Each gets a focused spec when prioritized.
 Personalized telemetry, analytics, and fantasy tools are candidates for future
 authentication or paid access. Exact free-versus-paid boundaries are undecided.
 Accounts and payments are not prerequisites for browsing the first release.
-Supabase is the preferred backend candidate; select a concrete role such as durable
-provider snapshots before making a database mandatory for the first slice.
+Supabase will persist validated F1 data with scheduled ingestion in the backend
+phase. The frontend outline uses fixtures first; see the [roadmap](roadmap.md).
 
 ## Release readiness
 

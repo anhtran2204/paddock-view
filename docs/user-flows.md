@@ -1,6 +1,6 @@
 # User flows and route map
 
-**Status: proposed.** Only `/` currently exists, as a placeholder. The paths below
+**Status: approved route direction, updated 2026-10-19; not implemented.** Only `/` currently exists, as a placeholder. The paths below
 are design contracts, not available endpoints. Use an explicit `f1` namespace now
 to avoid ambiguous links when another series arrives; do not build a generic series
 framework before a second series has real requirements.
@@ -62,6 +62,23 @@ route proposals, not first-release scaffolding. Keep public feature previews dis
 from protected data, and add sign-in/upgrade actions only when they lead to working
 flows. A separate repository, deployment, or subdomain is not required.
 
+## Public and private boundaries
+
+Use `(public)`, `(auth)`, and `(private)` route groups for distinct layouts. Groups
+do not alter URLs; a real `app/` directory inside `(private)` creates `/app/...`.
+Future workspaces include telemetry, analytics, fantasy, and settings. Public
+feature/pricing pages stay in the public group. Do not scaffold empty private
+features during the public frontend outline.
+
+Keep feature modules domain-based so a public preview and protected workspace can
+reuse safe components. A private layout checks authentication; data reads and
+mutations enforce identity, ownership, and paid entitlements independently. Not all
+signed-in features are paid. Route placement or hiding navigation is not access
+control. See [architecture](architecture.md#responsibilities-and-proposed-structure).
+
+The frontend outline uses fixtures matching production read contracts; it must
+exercise the states below before database implementation begins.
+
 ## Main journeys
 
 ```mermaid
@@ -96,15 +113,15 @@ never interpret the server's local zone as the viewer's. Initial server markup c
 use UTC and a small client component can convert after hydration. Season and result
 selection belong in the URL; ephemeral disclosure state can remain local React state.
 
-| Data condition                        | User-facing behavior                                                     |
-| ------------------------------------- | ------------------------------------------------------------------------ |
-| Loading                               | Stable skeleton or labelled pending region; navigation stays usable      |
-| Not yet published                     | Explain that results are awaiting publication and offer retry            |
-| Not supported / unknown coverage      | Explain the source limitation without claiming the session did not occur |
-| Stale cached data                     | Retain usable data, show its retrieval time and stale warning            |
-| Partial data                          | Show available fields and explicit missing values; no made-up zeroes     |
-| Provider failure with no usable cache | Error message and retry, separate from an empty result                   |
+| Data condition                   | User-facing behavior                                                     |
+| -------------------------------- | ------------------------------------------------------------------------ |
+| Loading                          | Stable skeleton or labelled pending region; navigation stays usable      |
+| Not yet published                | Explain that results are awaiting publication and offer retry            |
+| Not supported / unknown coverage | Explain the source limitation without claiming the session did not occur |
+| Stale cached data                | Retain usable data, show its retrieval time and stale warning            |
+| Partial data                     | Show available fields and explicit missing values; no made-up zeroes     |
+| Read failure with no usable data | Error message and retry, separate from an empty result                   |
 
-Retry reuses the same bounded server read; it does not bypass provider limits or
-promise an immediate cache refresh. Exact freshness policy lives in the
+Retry reuses the stored-data read; it does not directly trigger provider ingestion
+or promise an immediate cache refresh. Exact freshness policy lives in the
 [data contract](data-contracts.md#freshness-and-failure-policy).

@@ -7,7 +7,9 @@ that public content, SEO, and fast initial loads matter from the first release,
 with personalized/authenticated or premium tools planned later. This supersedes
 the initial personal-first audience assumption. **Vercel is the confirmed initial
 host**; retain Next.js for the public-plus-private application. Supabase is the
-preferred backend candidate, with its initial responsibilities still proposed.
+approved backend for durable data, scheduled ingestion, and private raw captures.
+On **2026-10-19**, the owner approved frontend-first delivery, public/private route
+boundaries, and the testing/operations baseline.
 The product vision remains in the [root README](../README.md).
 
 ## Read in this order
@@ -22,6 +24,9 @@ The product vision remains in the [root README](../README.md).
 | [Developer guide](development.md)      | Setup, validation, documentation maintenance, and Graphify workflow   |
 | [Roadmap and decisions](roadmap.md)    | Delivery slices, unresolved choices, and when to decide them          |
 
+See [operations, testing, and delivery](operations.md) for monitoring responsibilities,
+test layers, environment separation, and staged CI/CD setup.
+
 ## Status vocabulary
 
 - **Observed**: verified in this checkout or a dated external source.
@@ -31,8 +36,8 @@ The product vision remains in the [root README](../README.md).
 
 The owner approved this documentation as the planning baseline on **2026-10-18**,
 including the public dashboard homepage. Proposed requirements and architecture
-describe the accepted direction, not shipped behavior. Explicit open choices such
-as Supabase's first-slice responsibility remain unresolved. Only the app shell
+describe the accepted direction, not shipped behavior. The 2026-10-19 decisions settle Supabase ownership and delivery sequencing;
+budget, region, runtime pins, and deployment setup remain implementation prerequisites. Only the app shell
 exists today. This set is a design brief, not a task-by-task implementation plan.
 
 ## Keeping this useful

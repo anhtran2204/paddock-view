@@ -44,11 +44,11 @@ pnpm exec prettier --check README.md 'docs/**/*.md'
 git diff --check
 ```
 
-There is no test runner or `test` script yet. Add focused adapter/normalization tests
-with the first feature; choose the smallest runner that suits the actual modules.
-Add browser automation when the first complete journey exists. A Vitest-style unit
-runner and Playwright are candidates, not installed requirements or choices already
-made. Do not add a new runner solely to validate prose.
+There is no test runner or `test` script yet. The approved baseline selects Vitest
+for web/domain logic, native Deno tests for Edge Functions, database/RLS tests with
+local Supabase, and Playwright for browser journeys. Introduce each with its layer;
+see [operations and testing](operations.md). Small frontend CI comes first; backend
+implementation and backend CI/CD follow acceptance of the fixture-backed outline.
 
 ## Feature delivery workflow
 
@@ -56,8 +56,9 @@ made. Do not add a new runner solely to validate prose.
    Query Graphify first for behavior, definitions, dependencies, and related tests.
 2. Review a focused spec and implementation plan for the delivery slice. Avoid
    turning the entire long-term roadmap into speculative implementation tasks.
-3. Deliver one vertical slice: provider fixture → adapter/read function → UI → failure
-   states → verification. Keep provider calls and secrets on the server.
+3. First deliver the public UI outline and states with typed fixtures. After its
+   acceptance, connect calendar → results → standings as backend-to-UI slices.
+   Only ingestion calls providers; web reads use stored validated data.
 4. Test important behavior: missing fields, pagination, malformed data, provider
    timeouts/429, publication delays, UTC/local display, and navigation as applicable.
    CI uses fixtures; separately record a bounded real-provider smoke check.

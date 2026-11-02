@@ -43,8 +43,9 @@ A public motorsport dashboard, starting with Formula 1, that brings live race da
 Start with the [documentation hub](docs/README.md) for the current implementation,
 proposed requirements, user flows, architecture, data contracts, and roadmap.
 The initial direction is a public Next.js application on Vercel, with search-friendly
-content and future authenticated or premium tools. Supabase is the preferred backend
-candidate; its first-release responsibilities remain under design.
+content and future authenticated or premium tools. Supabase will own durable F1 data and scheduled ingestion. Development starts with
+a fixture-backed public frontend outline; backend implementation and its CI/CD
+follow once the outline and data contracts are accepted.
 
 See the [developer guide](docs/development.md) for local setup and the workflow
 for keeping documentation and the Graphify index aligned with implementation.
