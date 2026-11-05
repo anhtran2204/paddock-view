@@ -15,5 +15,8 @@
 
   // Optional: If you use Prettier alongside ESLint, set it as the default formatter
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
