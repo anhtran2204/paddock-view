@@ -7,6 +7,9 @@ import Footer from "@/components/ui/footer";
 import { Suspense } from "react";
 import Loading from "./loading";
 import { ThemeProvider } from "@/components/theme-provider";
+import Error from "./error";
+import { ErrorBoundary } from "react-error-boundary";
+import NotFound from "./not-found";
 
 const ibmPlexSans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -51,9 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           disableTransitionOnChange
         >
           <Header />
-          <Suspense fallback={<Loading />}>
-            <main className="flex flex-1">{children}</main>
-          </Suspense>
+          <main className="flex flex-1">{children}</main>
           <Footer />
         </ThemeProvider>
       </body>
